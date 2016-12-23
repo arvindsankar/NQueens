@@ -2,6 +2,7 @@ import random
 import operator, time
 
 class Solver:
+	# Initialize board and make conflicts dictionary
 	def __init__(self, numRow=8, numCol=8, numQueen=8):
 		self.rows = numRow
 		self.cols = numCol
@@ -16,18 +17,16 @@ class Solver:
 		self.queen_squares = self.randomQueens()
 		self.update_conflicts()
 
+	# Place one queen on each row
 	def randomQueens(self):
 		queen_squares = []
-		while len(queen_squares) < self.numQueen:
+		for col in range(self.cols):
 			row = random.randint(0, self.rows - 1)
-			col = random.randint(0, self.cols - 1)
-			square = (row, col)
-			# If valid, add to the list
-			if square not in queen_squares:
-				queen_squares.append(square)
+			queen_squares.append((row, col))
 		print queen_squares
 		return queen_squares
 	
+	# Get all the squares a queen on 'square' hits
 	def get_neighbors(self, square):
 		row, col = square[0], square[1]
 		neighbors = []
@@ -41,12 +40,16 @@ class Solver:
 					neighbors.append((r, c))
 		return neighbors
 
+	# update the conflicts dictionary
 	def update_conflicts(self):
 		self.conflicts = dict.fromkeys(self.conflicts.iterkeys(), 0)
 		for queen in self.queen_squares:
 			neighbors = self.get_neighbors(queen)
 			for neighbor in neighbors:
 				self.conflicts[neighbor] += 1
+
+	# with probaility (1 - alpha), move a random queen to the min conflict square
+	# with probability (alpha), move a random queen to a random unoccupied square
 
 	def update(self, alpha = 0.05):
 		index = random.randint(0, self.numQueen - 1)
@@ -70,13 +73,14 @@ class Solver:
 			self.queen_squares.append(square)
 		self.update_conflicts()
 
-
+	# Checks if the board is currently solved.
 	def isSolved(self):
 		for queen in self.queen_squares:
 			if self.conflicts[queen] != 1:
 				return False
 		return True
 
+	# update and keep running until solved.
 	def run(self):
 		iteration = 0
 		while(not self.isSolved()):
@@ -93,9 +97,9 @@ class Solver:
 				print string
 			print conflicts
 			iteration += 1
-			time.sleep(0.25)
 			print "Iteration: " + str(iteration)
 			print
 		print "SOLVED: " + str(self.queen_squares)
+
 solver = Solver()
 solver.run()
