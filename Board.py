@@ -49,21 +49,21 @@ class Solver:
 				self.conflicts[neighbor] += 1
 
 	def update(self, alpha = 0.05):
-		index = max(self.queen_squares, key=operator.itemgetter(1))[0]
-		self.queen_squares.pop(index)
+		index = random.randint(0, self.numQueen - 1)
+		used_square = self.queen_squares.pop(index)
 		self.update_conflicts()
 		sample = random.random()
 		if sample >= alpha:
 			i = 0
 			square = sorted(self.conflicts.items(), key=lambda x: x[1])[i][0]
-			while square in self.queen_squares:
+			while square in self.queen_squares or square == used_square:
 				i += 1
 				square = sorted(self.conflicts.items(), key=lambda x: x[1])[i][0]
 			self.queen_squares.append(square)
 		else:
 			print "ALPHA EVENT"
 			square = self.queen_squares[0]
-			while square in self.queen_squares:
+			while square in self.queen_squares or square == used_square:
 				row = random.randint(0, self.rows - 1)
 				col = random.randint(0, self.cols - 1)
 				square = (row, col)
@@ -78,6 +78,7 @@ class Solver:
 		return True
 
 	def run(self):
+		iteration = 0
 		while(not self.isSolved()):
 			self.update()
 			conflicts = []
@@ -85,14 +86,15 @@ class Solver:
 				string = ""
 				for c in range(self.cols):
 					if (r, c) in self.queen_squares:
-						string += "*"
+						string += "Q"
 						conflicts.append(self.conflicts[(r,c)])
 					else:
-						string += str(self.conflicts[(r,c)])
+						string += "X"
 				print string
 			print conflicts
-			time.sleep(1)
-			print
+			iteration += 1
+			time.sleep(0.25)
+			print "Iteration: " + str(iteration)
 			print
 		print "SOLVED: " + str(self.queen_squares)
 solver = Solver()
